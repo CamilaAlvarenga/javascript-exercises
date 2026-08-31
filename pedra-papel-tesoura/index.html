@@ -40,7 +40,8 @@
             margin-top: 60px;
         }
 
-        .reset-score-button{
+        .reset-score-button,
+        .auto-play-button{
             background-color: white;
             border: none;
             font-size: 15px;
@@ -52,17 +53,17 @@
 <body>
     <p>Rock Paper Scissors</p>
 
-    <button onclick="
-        playGame('rock');
-    " class="move-button"><img src="images/rock-emoji.png" alt="rock" class="move-icon"></button>
+    <button class="move-button js-rock-button">
+        <img src="images/rock-emoji.png" alt="rock" class="move-icon">
+    </button>
 
-    <button onclick="
-        playGame('paper');
-    " class="move-button"><img src="images/paper-emoji.png" alt="" class="move-icon"></button>
+    <button class="move-button js-paper-button">
+        <img src="images/paper-emoji.png" alt="" class="move-icon">
+    </button>
 
-    <button onclick="
-        playGame('scissors');
-    " class="move-button"><img src="images/scissors-emoji.png" alt="" class="move-icon"></button>
+    <button class="move-button js-scissors-button">
+        <img src="images/scissors-emoji.png" alt="" class="move-icon">
+    </button>
 
     <p class="js-result result"></p>
     <p class="js-moves"></p>
@@ -76,6 +77,10 @@
         updateScoreElement();
     " class="reset-score-button">Reset Score</button>
 
+    <button onclick="
+        autoPlay();
+    " class="auto-play-button">Auto Play</button>
+
     <script>
         let score = JSON.parse(localStorage.getItem('score')) || {
             wins: 0,
@@ -84,6 +89,44 @@
         };
 
         updateScoreElement();
+
+        let isAutoPlaying = false;
+        let intervalId;
+
+        function autoPlay() {
+            if (!isAutoPlaying) {
+                intervalId = setInterval(() => {
+                    const playerMove = pickComputerMove();
+                    playGame(playerMove);
+                }, 1000);
+                isAutoPlaying = true;
+            } else {
+                clearInterval(intervalId);
+                isAutoPlaying = false;
+            }
+        }
+
+        document.querySelector('.js-rock-button').addEventListener('click', () => {
+            playGame('rock');
+        });
+
+        document.querySelector('.js-paper-button').addEventListener('click', () => {
+            playGame('paper');
+        });
+
+        document.querySelector('.js-scissors-button').addEventListener('click', () => {
+            playGame('scissors');
+        });
+
+        document.body.addEventListener('keydown', (event) => {
+            if (event.key === 'r' || event.key === 'R') {
+                playGame('rock');
+            } else if (event.key === 'p' || event.key === 'P') {
+                playGame('paper');
+            } else if (event.key === 's' || event.key === 'S') {
+                playGame('scissors');
+            }
+        });
 
         function playGame(playerMove) {
             const computerMove = pickComputerMove();
